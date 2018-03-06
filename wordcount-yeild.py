@@ -42,15 +42,6 @@ import re
 import string
 
 
-def remove_caracter(linha):
-    return re.sub('[%s]' % re.escape(string.punctuation), '', linha or '')
-
-# +++your code here+++
-# Define print_words(filename) and print_top(filename) functions.
-# You could write a helper utility function that reads a file
-# and builds and returns a word/count dict for it.
-# Then print_words() and print_top() can just call the utility function.
-
 def ler_arquivo(arquivo):
     f = open(arquivo, 'rU')
     while True:
@@ -60,20 +51,30 @@ def ler_arquivo(arquivo):
         yield linha
     f.close()
 
-def print_words(arquivo):
-    words = {}
+def contar_palavras(arquivo):
+    contador_palavra = {}
     for linha in ler_arquivo(arquivo):
-        palavras = remove_caracter(linha).split()
-        for p in palavras:
-            p = p.lower()
-            if words.get(p):
-                words[p] += 1
+        linha = re.sub('[%s]' % re.escape(string.punctuation), '', linha or '')
+        for palavra in linha.split():
+            palavra = palavra.lower()
+            if contador_palavra.get(palavra):
+                contador_palavra[palavra] += 1
             else:
-                words[p] = 1
-    for key, valor in sorted(words.items(), key=lambda x: x[1]):
-        print key, ' ', valor
+                contador_palavra[palavra] = 1
+    return contador_palavra
 
-###
+def print_words(arquivo):
+    for key, count in sorted(contar_palavras(arquivo).items(), key=lambda x: x[1]):
+        print key, count
+
+
+def print_top(arquivo):
+    num = 1
+    for key, count in sorted(contar_palavras(arquivo).items(), key=lambda x: x[1], reverse=True):
+        print num, key, count
+        num += 1
+        if num > 20:
+            break
 
 # This basic command line argument parsing code is provided and
 # calls the print_words() and print_top() functions which you must define.
@@ -94,4 +95,3 @@ def main():
 
 if __name__ == '__main__':
   main()
-
